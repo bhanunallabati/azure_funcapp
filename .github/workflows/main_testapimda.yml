@@ -38,13 +38,16 @@ jobs:
         run: |
              cd ./AzureStorageQueueTriggerFunction
              python -m pip install --upgrade pip
-             pip install -r /AzureStorageQueueTriggerFunction/requirements.txt
+             cd /AzureStorageQueueTriggerFunction
+              pip install --target="./.python_packages/lib/site-packages" -r requirements.txt 
 
       # Optional: Add step to run tests here
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./AzureStorageQueueTriggerFunction/* -r
-
+        run: |
+          cd AzureStorageQueueTriggerFunction
+          zip -r ../AzureStorageQueueTriggerFunction.zip ./*
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -67,7 +70,7 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip     
+        run: unzip AzureStorageQueueTriggerFunction.zip     
         
       - name: Login to Azure
         uses: azure/login@v2
