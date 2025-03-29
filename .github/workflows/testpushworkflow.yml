@@ -18,6 +18,7 @@ jobs:
         run: |
           if git diff --name-only $GITHUB_SHA^ $GITHUB_SHA | grep -q '^AzureStorageQueueTriggerFunction/'; then
             echo "Detected changes in AzureStorageQueueTriggerFunction"
+          fi
             echo "config=AzureStorageQueueTriggerFunction_Config" >> $GITHUB_ENV
           elif git diff --name-only $GITHUB_SHA^ $GITHUB_SHA | grep -q '^functionapp/'; then
             echo "Detected changes in functionapp"
