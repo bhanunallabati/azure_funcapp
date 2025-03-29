@@ -1,0 +1,29 @@
+name: Assign Config Variable Based on Folder Changes
+
+on:
+  push:
+    paths:
+      - 'AzureStorageQueueTriggerFunction/**'
+      - 'functionapp/**'
+
+jobs:
+  assign-config:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Config for AzureStorageQueueTriggerFunction
+        if: ${{ github.event.head_commit.modified && startsWith(github.event.head_commit.modified[0], 'AzureStorageQueueTriggerFunction') }}
+        run: |
+          echo "Triggered from AzureStorageQueueTriggerFunction"
+          config="AzureStorageQueueTriggerFunction_Config"
+          echo "Config variable is set to: $config"
+
+      - name: Set Config for functionapp
+        if: ${{ github.event.head_commit.modified && startsWith(github.event.head_commit.modified[0], 'functionapp') }}
+        run: |
+          echo "Triggered from functionapp"
+          config="functionapp_Config"
+          echo "Config variable is set to: $config"
