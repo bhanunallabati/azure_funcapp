@@ -1,29 +1,41 @@
-name: Trigger Pipeline on Push and Assign Config
+name: PR to Main Workflow
 
 on:
-  push:
+  pull_request:
+    branches:
+      - main
     paths:
-      - 'AzureStorageQueueTriggerFunction/**'
-      - 'functionapp/**'
+      - 'AzureStorageQueueTriggerFunction/**'  # Trigger if there are changes in folder1
+      - 'functionapp/**'  # Trigger if there are changes in folder2
 
 jobs:
-  assign-config:
+  set-config:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Assign Config for AzureStorageQueueTriggerFunction
-        if: ${{ contains(github.event.paths, 'AzureStorageQueueTriggerFunction/') }}
+      - name: Determine changes and set config value
+        id: set_config
         run: |
-          echo "Changes detected in AzureStorageQueueTriggerFunction folder"
-          config="AzureStorageQueueTriggerFunction_Config"
-          echo "Config is set to: $config"
+          # Initialize config variable
+          CONFIG="default"
 
-      - name: Assign Config for functionapp
-        if: ${{ contains(github.event.paths, 'functionapp/') }}
+          # Check if changes are made to folder1
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^functionapp/"; then
+            CONFIG="functionapp"
+          fi
+
+          # Check if changes are made to folder2
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^AzureStorageQueueTriggerFunction/"; then
+            CONFIG="AzureStorageQueueTriggerFunction"
+          fi
+
+          # Export the config value as an environment variable
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+
+      - name: Print the config value
         run: |
-          echo "Changes detected in functionapp folder"
-          config="functionapp_Config"
-          echo "Config is set to: $config"
+          echo "The assigned config value is: ${{ env.CONFIG }}"
+
