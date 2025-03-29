@@ -21,6 +21,7 @@ jobs:
         id: changes
         run: |
           # Get the list of changed files between the last commit and the previous commit
+          echo "change frm ${{ github.event.pull_request.head.ref }}"
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
           cat changed_files.txt
 
