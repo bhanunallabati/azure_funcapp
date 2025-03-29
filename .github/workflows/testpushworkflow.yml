@@ -20,7 +20,7 @@ jobs:
           
           # Get the list of changed files between the base and head commits for the PR
           # Using `github.event.pull_request.base.sha` (base commit) and `github.sha` (head commit)
-          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > modified_files.txt
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(functionapp/|AzureStorageQueueTriggerFunction/)' > modified_files.txt
           
           # Output the list of modified files
           cat modified_files.txt
