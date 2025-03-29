@@ -23,4 +23,5 @@ jobs:
             echo "Detected changes in functionapp"
             echo "config=functionapp_Config" >> $GITHUB_ENV
           else
-            echo "No matching folder changes detected "
+            echo "No matching folder changes detected"
+          fi
