@@ -31,3 +31,17 @@ jobs:
         run: |
           # Make the list of modified files available for later steps
           echo "::set-output name=modified_files::$(cat modified_files.txt)"
+      - name: Check if modified files are from functionapp or AzureStorageQueueTriggerFunction
+        id: check-changes
+        run: |
+          # Check if any modified file is in functionapp or AzureStorageQueueTriggerFunction
+          if grep -q '^functionapp/' modified_files.txt; then
+            echo "functionapp changes detected."
+            echo "EXECUTE_FUNCTIONAPP=true" >> $GITHUB_ENV
+          fi
+          
+          if grep -q '^AzureStorageQueueTriggerFunction/' modified_files.txt; then
+            echo "AzureStorageQueueTriggerFunction changes detected."
+            echo "EXECUTE_AZURE_STORAGE=true" >> $GITHUB_ENV
+          fi
+
