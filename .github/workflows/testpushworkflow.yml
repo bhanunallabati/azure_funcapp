@@ -37,5 +37,5 @@ jobs:
 
       - name: Print the config value
         run: |
-          echo "The assigned config value is: ${{ env.CONFIG }}"
+          echo "The assigned config value is: ${{ env.CONFIG }}, ${{ github.event.before }} ${{ github.sha }} "
 
