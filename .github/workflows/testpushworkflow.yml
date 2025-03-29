@@ -1,29 +1,33 @@
-name: Assign Config Variable Based on Folder Changes
+name: Trigger Pipeline on PR and Assign Config Variable
 
 on:
-  push:
+  pull_request:
     paths:
       - 'AzureStorageQueueTriggerFunction/**'
       - 'functionapp/**'
 
 jobs:
-  assign-config:
+  assign-config-and-trigger:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Config for AzureStorageQueueTriggerFunction
-        if: ${{ github.event.head_commit.modified && startsWith(github.event.head_commit.modified[0], 'AzureStorageQueueTriggerFunction') }}
+      - name: Detect Changes and Assign Config for AzureStorageQueueTriggerFunction
+        if: ${{ github.event.pull_request.changed_files && contains(github.event.pull_request.changed_files, 'AzureStorageQueueTriggerFunction/') }}
         run: |
-          echo "Triggered from AzureStorageQueueTriggerFunction"
+          echo "Changes detected in AzureStorageQueueTriggerFunction folder"
           config="AzureStorageQueueTriggerFunction_Config"
-          echo "Config variable is set to: $config"
+          echo "Config is set to: $config"
 
-      - name: Set Config for functionapp
-        if: ${{ github.event.head_commit.modified && startsWith(github.event.head_commit.modified[0], 'functionapp') }}
+      - name: Detect Changes and Assign Config for functionapp
+        if: ${{ github.event.pull_request.changed_files && contains(github.event.pull_request.changed_files, 'functionapp/') }}
         run: |
-          echo "Triggered from functionapp"
+          echo "Changes detected in functionapp folder"
           config="functionapp_Config"
-          echo "Config variable is set to: $config"
+          echo "Config is set to: $config"
+
+      - name: Execute Pipeline Based on Config
+        run: |
+          echo "Triggering pipeline with config: $config"
