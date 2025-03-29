@@ -23,7 +23,9 @@ jobs:
           git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(functionapp/|AzureStorageQueueTriggerFunction/)' > modified_files.txt
           
           # Output the list of modified files
+          echo "files modfied start"
           cat modified_files.txt
+          echo "files modfied end"
 
       - name: Set modified files as output
         run: |
