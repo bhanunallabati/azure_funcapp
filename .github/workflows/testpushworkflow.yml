@@ -1,60 +1,31 @@
-name: Detect Changes in Specific Directories
+name: List Modified Files in PR
 
 on:
-  push:
-    paths:
-      - 'AzureStorageQueueTriggerFunction/**'
-      - 'functionapp/**'
   pull_request:
-    paths:
-      - 'AzureStorageQueueTriggerFunction/**'
-      - 'functionapp/**'
+    branches:
+      - main
 
 jobs:
-  detect_changes:
+  list-modified-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get modified files
-        id: changes
+      - name: Get the list of modified files
+        id: modified_files
         run: |
-          # Get the list of changed files between the last commit and the previous commit
-          echo "change frm ${{ github.event.pull_request.head.ref }}"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
-          cat changed_files.txt
+          # Fetch all commits to ensure we have the base commit reference
+          git fetch --prune --unshallow
+          
+          # Get the list of changed files between the base and head commits for the PR
+          # Using `github.event.pull_request.base.sha` (base commit) and `github.sha` (head commit)
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > modified_files.txt
+          
+          # Output the list of modified files
+          cat modified_files.txt
 
-      - name: Check for changes in functionapp
-        id: check_functionapp
+      - name: Set modified files as output
         run: |
-          # Check if any files have been modified under the 'functionapp/' directory
-          if grep -q '^functionapp/' changed_files.txt; then
-            echo "Changes detected in functionapp."
-            echo "functionapp=true" >> $GITHUB_ENV
-          else
-            echo "No changes detected in functionapp."
-            echo "functionapp=false" >> $GITHUB_ENV
-          fi
-
-      - name: Check for changes in AzureStorageQueueTriggerFunction
-        id: check_azure_storage
-        run: |
-          # Check if any files have been modified under the 'AzureStorageQueueTriggerFunction/' directory
-          if grep -q '^AzureStorageQueueTriggerFunction/' changed_files.txt; then
-            echo "Changes detected in AzureStorageQueueTriggerFunction."
-            echo "azure_storage=true" >> $GITHUB_ENV
-          else
-            echo "No changes detected in AzureStorageQueueTriggerFunction."
-            echo "azure_storage=false" >> $GITHUB_ENV
-          fi
-
-      - name: Print changes from functionapp
-        if: env.functionapp == 'true'
-        run: |
-          echo "Changes are from functionapp."
-
-      - name: Print changes from AzureStorageQueueTriggerFunction
-        if: env.azure_storage == 'true'
-        run: |
-          echo "Changes are from AzureStorageQueueTriggerFunction."
+          # Make the list of modified files available for later steps
+          echo "::set-output name=modified_files::$(cat modified_files.txt)"
