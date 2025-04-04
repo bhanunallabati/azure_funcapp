@@ -1,4 +1,4 @@
-name: Example Workflow
+name: Override ENV Variable Example
 
 on:
   push:
@@ -8,18 +8,15 @@ on:
 jobs:
   example_job:
     runs-on: ubuntu-latest
+    env:
+      MY_VARIABLE: 'initial_value'  # Set initial value
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Print initial value
+        run: echo "Initial value: $MY_VARIABLE"
 
-      - name: Set a variable in $GITHUB_ENV
+      - name: Override env variable for subsequent steps
         run: |
-          echo "MY_VARIABLE=value_to_use" >> $GITHUB_ENV
-          
-      - name: Conditionally run a step based on the variable
-        if: env.MY_VARIABLE == 'value_to_use'
-        run: |
-          echo "The variable is correctly set, and this step runs."
-        
-      - name: Run another step that always runs
-        run: echo "This step runs regardless of the condition."
+          echo "MY_VARIABLE=overridden_value" >> $GITHUB_ENV
+
+      - name: Print overridden value
+        run: echo "Overridden value: $MY_VARIABLE"
