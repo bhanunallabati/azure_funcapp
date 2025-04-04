@@ -1,0 +1,25 @@
+name: Example Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  example_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set a variable in $GITHUB_ENV
+        run: |
+          echo "MY_VARIABLE=value_to_use" >> $GITHUB_ENV
+          
+      - name: Conditionally run a step based on the variable
+        if: env.MY_VARIABLE == 'value_to_use'
+        run: |
+          echo "The variable is correctly set, and this step runs."
+        
+      - name: Run another step that always runs
+        run: echo "This step runs regardless of the condition."
