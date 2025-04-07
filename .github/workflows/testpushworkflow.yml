@@ -21,6 +21,13 @@ jobs:
           # Get the list of changed files between the base and head commits for the PR
           # Using `github.event.pull_request.base.sha` (base commit) and `github.sha` (head commit)
           git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(functionapp/|AzureStorageQueueTriggerFunction/)' > modified_files.txt
+          git diff --name-only --diff-filter=AM origin/main...HEAD | grep '/.*' | sed 's|/.*||' | sort -u > listoffolders.txt
+
+          # Output the list of modified files
+          echo "fileshvjcdbdsjc modfied start"
+          cat listoffolders.txt
+          echo "filesnbjhfeh modfied end"
+
           
           # Output the list of modified files
           echo "files modfied start"
