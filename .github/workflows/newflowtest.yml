@@ -37,8 +37,8 @@ jobs:
       - name: Terraform Apply (SIT)
         run: |
           echo "✅ Applying SIT Terraform (snow)"
-          terraform init
-          terraform apply -auto-approve
+          #terraform init
+          #terraform apply -auto-approve
 
   uat_apply:
     name: Terraform Apply for UAT
@@ -50,8 +50,8 @@ jobs:
       - name: Terraform Apply (UAT)
         run: |
           echo "✅ Applying UAT Terraform (snow)"
-          terraform init
-          terraform apply -auto-approve
+          #terraform init
+          #terraform apply -auto-approve
 
   follow_up:
     name: Follow-up Job After SIT or UAT
