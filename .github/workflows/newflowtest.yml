@@ -58,9 +58,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [sit_apply, uat_apply]
     if: |
-      (needs.sit_apply.result == 'success' || needs.uat_apply.result == 'success') &&
-      (github.event.inputs.environment_group == 'SIT' || github.event.inputs.environment_group == 'UAT') &&
-      github.event.inputs.configuration == 'snow'
+      github.event.inputs.configuration == 'snow' &&
+      (github.event.inputs.environment_group == 'SIT' || github.event.inputs.environment_group == 'UAT')
     steps:
       - name: Post-deployment Task
         run: |
