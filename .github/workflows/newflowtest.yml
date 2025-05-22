@@ -1,4 +1,4 @@
-name: Conditional Terraform Deployment
+name: Conditional Terraform with Follow-up
 
 on:
   workflow_dispatch:
@@ -27,13 +27,41 @@ on:
           - abc
 
 jobs:
-  deploy:
-    name: Terraform Apply for SIT or UAT with Configuration snow
+  sit_apply:
+    name: Terraform Apply for SIT
     runs-on: ubuntu-latest
     if: |
-      contains(fromJson('["SIT", "UAT"]'), github.event.inputs.environment_group) &&
+      github.event.inputs.environment_group == 'SIT' &&
       github.event.inputs.configuration == 'snow'
     steps:
-      - name: Run Terraform Apply
+      - name: Terraform Apply (SIT)
         run: |
-          echo "✅ Running Terraform for ${{ github.event.inputs.environment_group }} with config ${{ github.event.inputs.configuration }}"
+          echo "✅ Applying SIT Terraform (snow)"
+          terraform init
+          terraform apply -auto-approve
+
+  uat_apply:
+    name: Terraform Apply for UAT
+    runs-on: ubuntu-latest
+    if: |
+      github.event.inputs.environment_group == 'UAT' &&
+      github.event.inputs.configuration == 'snow'
+    steps:
+      - name: Terraform Apply (UAT)
+        run: |
+          echo "✅ Applying UAT Terraform (snow)"
+          terraform init
+          terraform apply -auto-approve
+
+  follow_up:
+    name: Follow-up Job After SIT or UAT
+    runs-on: ubuntu-latest
+    needs: [sit_apply, uat_apply]
+    if: |
+      (needs.sit_apply.result == 'success' || needs.uat_apply.result == 'success') &&
+      (github.event.inputs.environment_group == 'SIT' || github.event.inputs.environment_group == 'UAT') &&
+      github.event.inputs.configuration == 'snow'
+    steps:
+      - name: Post-deployment Task
+        run: |
+          echo "🎉 Follow-up triggered for ${{ github.event.inputs.environment_group }} with configuration ${{ github.event.inputs.configuration }}"
